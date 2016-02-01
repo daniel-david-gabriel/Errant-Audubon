@@ -1,0 +1,22 @@
+apply plugin: 'java'
+
+task buildZip(type: Zip){
+	extension = "love"
+
+	from('lua') {
+		into 'lua'
+	}
+	from('media') {
+		into 'media'
+	}
+	from('.git') {
+		into '.git'
+	}
+
+	from(projectDir) {
+		include 'conf.lua'
+		include 'main.lua'
+		include 'build.gradle'
+		include '.gitignore'
+	} 		
+}

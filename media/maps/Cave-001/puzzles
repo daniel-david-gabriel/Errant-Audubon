@@ -1,0 +1,6 @@
+Switch 14 11 light Lock-A,Lock-B
+Switch 4 14 heavy Lock-C,Lock-D
+Block 4 16
+Block 19 6
+Block 20 6
+Block 21 6
