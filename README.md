@@ -1,6 +1,6 @@
 # Errant-Audubon
 
-Errant Audubon is a game that is currently under development. It is compatible with the Love Engine 0.8.0:
+Errant Audubon is a game that is currently under development. It is compatible with the Love Engine 0.10.0:
 https://bitbucket.org/rude/love/downloads
 
 # How to build
@@ -14,4 +14,3 @@ gradle buildZip
 Once you have built the project, there will be a .love file in {base_folder}/build.distributions. To run the game, run:
 
 love build/distributions/Errant-Audubon.love
-
