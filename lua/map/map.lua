@@ -429,7 +429,7 @@ end
 
 function Map.paintTile(self, x, y, tile)
 	love.graphics.setColor(255, 255, 255, 255) --probably should take from a map-based color scheme or theme
-	love.graphics.drawq(tiles:getTileSet(self.tileset), tiles:getTile(self.tileset, tile), x, y)
+	love.graphics.draw(tiles:getTileSet(self.tileset), tiles:getTile(self.tileset, tile), x, y)
 end
 
 function Map.canMove(self, sprite, direction, speed)

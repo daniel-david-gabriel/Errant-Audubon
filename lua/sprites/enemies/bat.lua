@@ -30,9 +30,9 @@ function Bat.draw(self)
 	love.graphics.setColor(255, 255, 255, 255)
 	local sprites = images:getImage(self.spriteName)
 	if self.isWaiting then
-		love.graphics.drawq(sprites["image"], sprites["quads"][4], (self.x)-48, (self.y)-32)
+		love.graphics.draw(sprites["image"], sprites["quads"][4], (self.x)-48, (self.y)-32)
 	else
-		love.graphics.drawq(sprites["image"], sprites["quads"][self.spriteCounter], (self.x)-48, (self.y)-32)
+		love.graphics.draw(sprites["image"], sprites["quads"][self.spriteCounter], (self.x)-48, (self.y)-32)
 	end
 end
 

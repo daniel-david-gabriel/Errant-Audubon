@@ -59,7 +59,7 @@ function Knight.draw(self)
 	end
 	love.graphics.setColor(255, 255, 255, 255)
 	local sprites = images:getImage(self.spriteName)
-	love.graphics.drawq(sprites["image"], sprites["quads"][self.facingDirection][self.spriteCounter], (self.x)-32, (self.y)-64)
+	love.graphics.draw(sprites["image"], sprites["quads"][self.facingDirection][self.spriteCounter], (self.x)-32, (self.y)-64)
 
 	if not (self.tool == nil) then
 		self.tool:draw()

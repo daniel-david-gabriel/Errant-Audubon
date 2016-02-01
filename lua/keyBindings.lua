@@ -22,7 +22,7 @@ function KeyBindings:_init()
 	self.bindings["left"] = "a"
 	self.bindings["right"] = "d"
 	self.bindings["menu"] = "return"
-	self.bindings["tool"] = " "
+	self.bindings["tool"] = "space"
 	self.bindings["subtool"] = "lshift"
 
 	if love.filesystem.exists(self.bindingsFilename) then
@@ -69,10 +69,6 @@ function KeyBindings.loadBindings(self)
 		local lineTokens = split(line, "%S+")
 		--inspect first token for valid value?
 
-		if lineTokens[2] == "(space)" then
-			lineTokens[2] = " "
-		end
-
 		self.bindings[lineTokens[1]] = lineTokens[2]
 	end
 end
@@ -80,9 +76,6 @@ end
 function KeyBindings.saveBindings(self)
 	local savedBindings = ""
 	for k,v in pairs(self.bindings) do
-		if v == " " then
-			v = "(space)"
-		end
 		savedBindings = savedBindings .. k .. " " .. v .. "\r\n"
 	end
 

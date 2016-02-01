@@ -32,11 +32,11 @@ function PotSpider.draw(self)
 	love.graphics.setColor(255, 255, 255, 255)
 	local sprites = images:getImage(self.spriteName)
 	if self.state == "sleep" then
-		love.graphics.drawq(sprites["image"], sprites["quads"]["sleep"..self.direction][1], (self.x)-32, (self.y)-64)
+		love.graphics.draw(sprites["image"], sprites["quads"]["sleep"..self.direction][1], (self.x)-32, (self.y)-64)
 	elseif self.state == "stand" then
-		love.graphics.drawq(sprites["image"], sprites["quads"]["stand"..self.direction][1], (self.x)-32, (self.y)-64)
+		love.graphics.draw(sprites["image"], sprites["quads"]["stand"..self.direction][1], (self.x)-32, (self.y)-64)
 	else
-		love.graphics.drawq(sprites["image"], sprites["quads"][self.direction][self.spriteCounter], (self.x)-32, (self.y)-64)
+		love.graphics.draw(sprites["image"], sprites["quads"][self.direction][self.spriteCounter], (self.x)-32, (self.y)-64)
 	end
 end
 

@@ -109,7 +109,7 @@ end
 function Game.loadMaps(self)
 	local maps = {}
 
-	local mapFiles = love.filesystem.enumerate("media/maps")
+	local mapFiles = love.filesystem.getDirectoryItems("media/maps")
 	for _,file in pairs(mapFiles) do
 		maps[file] = Map(file)
 	end

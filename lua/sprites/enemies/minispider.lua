@@ -28,7 +28,7 @@ end
 function Minispider.draw(self)
 	love.graphics.setColor(255, 255, 255, 255)
 	local sprites = images:getImage(self.spriteName)
-	love.graphics.drawq(sprites["image"], sprites["quads"][self.direction][self.spriteCounter], (self.x)-32, (self.y)-32)
+	love.graphics.draw(sprites["image"], sprites["quads"][self.direction][self.spriteCounter], (self.x)-32, (self.y)-32)
 end
 
 function Minispider.update(self, map, dt)
