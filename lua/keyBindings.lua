@@ -17,13 +17,13 @@ function KeyBindings:_init()
 
 	--Prepopulate bindings with defaults in case of incomplete bindings file
 	self.bindings["quit"] = "escape"
-	self.bindings["up"] = "w"
-	self.bindings["down"] = "s"
-	self.bindings["left"] = "a"
-	self.bindings["right"] = "d"
+	self.bindings["up"] = "up"
+	self.bindings["down"] = "down"
+	self.bindings["left"] = "left"
+	self.bindings["right"] = "right"
 	self.bindings["menu"] = "return"
-	self.bindings["tool"] = "space"
-	self.bindings["subtool"] = "lshift"
+	self.bindings["tool"] = "z"
+	self.bindings["subtool"] = "x"
 
 	if love.filesystem.exists(self.bindingsFilename) then
 		self:loadBindings()
@@ -69,6 +69,10 @@ function KeyBindings.loadBindings(self)
 		local lineTokens = split(line, "%S+")
 		--inspect first token for valid value?
 
+		if lineTokens[2] == "(space)" then
+			lineTokens[2] = " "
+		end
+
 		self.bindings[lineTokens[1]] = lineTokens[2]
 	end
 end
@@ -76,6 +80,9 @@ end
 function KeyBindings.saveBindings(self)
 	local savedBindings = ""
 	for k,v in pairs(self.bindings) do
+		if v == " " then
+			v = "(space)"
+		end
 		savedBindings = savedBindings .. k .. " " .. v .. "\r\n"
 	end
 

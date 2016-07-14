@@ -107,6 +107,53 @@ function Sprite.collidesWith(self, other)
 	return distance < ((self.height/2) + (other.height/2))
 end
 
+function Sprite.determineDirection(self, other)
+	num = math.abs(self.x - other.x)
+	if self.x <= other.x and self.y > other.y then
+		if self.y - num > other.y then
+			return "up"
+		else
+			return "right"
+		end
+	elseif self.x > other.x and self.y > other.y then
+		if self.y - num > other.y then
+			return "up"
+		else
+			return "left"
+		end
+	elseif self.x <= other.x and self.y <= other.y then
+		if self.y + num > other.y then
+			return "right"
+		else
+			return "down"
+		end
+	elseif self.x > other.x and self.y <= other.y then
+		if self.y + num > other.y then
+			return "left"
+		else
+			return "down"
+		end
+	end
+	
+	return "up"
+end
+
+function oppositeDirection(direction)
+	if direction == "down" then
+		return "up"
+	end
+	if direction == "up" then
+		return "down"
+	end
+	if direction == "left" then
+		return "right"
+	end
+	if direction == "right" then
+		return "left"
+	end
+	return "down"
+end
+
 --[[
 function Sprite.collidesWith(self, other)
 	--Use circles to determine collision. Lazy?

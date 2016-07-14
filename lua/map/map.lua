@@ -35,6 +35,7 @@ function Map:_init(mapName)
 
 	self.bullets = {}
 	self.items = {}
+	self.effects = {}
 end
 
 function Map.loadTitle(self, mapName)
@@ -123,7 +124,7 @@ function Map.createEnemy(self, enemyProperties)
 	elseif enemyProperties[1] == "Turret" then
 		enemy = Turret(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)	
 	elseif enemyProperties[1] == "Slime" then
-		enemy = Slime(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
+		enemy = Slime(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32, enemyProperties[4])
 	elseif enemyProperties[1] == "Minispider" then
 		enemy = Minispider(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
 	elseif enemyProperties[1] == "BlackBell" then
@@ -134,6 +135,16 @@ function Map.createEnemy(self, enemyProperties)
 		enemy = Bat(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
 	elseif enemyProperties[1] == "PotSpider" then
 		enemy = PotSpider(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
+	elseif enemyProperties[1] == "Porol" then
+		enemy = Porol(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32, enemyProperties[4])
+	elseif enemyProperties[1] == "Dummy" then
+		enemy = Dummy(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
+	elseif enemyProperties[1] == "Aurin" then
+		enemy = Aurin(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
+	elseif enemyProperties[1] == "Furotis" then
+		enemy = Furotis(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
+	elseif enemyProperties[1] == "Fireball" then
+		enemy = Fireball(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
 		
 	--Breakable Items
 	elseif enemyProperties[1] == "Amphora" then
@@ -324,7 +335,28 @@ function Map.removeLock(self, lockName)
 	table.remove(map.locks, toDelete)
 end
 
+function insertionSort(array)
+    local len = #array
+    local j
+    for j = 2, len do
+        local key = array[j]
+        local i = j - 1
+        while i > 0 and array[i].y > key.y do
+            array[i + 1] = array[i]
+            i = i - 1
+        end
+        array[i + 1] = key
+    end
+    return array
+end
+
 function Map.draw(self)
+	
+	--love.graphics.translate(-math.floor(knight.x-400), -math.floor(knight.y-300))
+	
+	-- earthquake effect
+	--love.graphics.translate( math.floor((math.random()*6)-3), math.floor((math.random()*6)-3) )
+
 	local x = 0
 	local y = 0
 
@@ -344,10 +376,14 @@ function Map.draw(self)
 	for i,item in pairs(self.items) do
 		item:draw()
 	end
-
-	for i,enemy in pairs(self.enemies) do
-		enemy:draw()
-	end
+	
+	--for i,effect in pairs(self.effects) do
+	--	effect:draw()
+	--end
+	
+	--for i,enemy in pairs(self.enemies) do
+	--	enemy:draw()
+	--end
 
 	for i,npc in pairs(self.npcs) do
 		npc:draw()
@@ -370,7 +406,27 @@ function Map.draw(self)
 		lock:draw()
 	end
 	
-	knight:draw()
+	--knight:draw()
+	
+	-- --- DRAW ARRAY --- --
+	draw_array = {}
+	
+	for n,enemy in pairs(self.enemies) do
+		table.insert(draw_array, enemy)
+	end
+	for i,effect in pairs(self.effects) do
+		table.insert(draw_array, effect)
+	end
+	
+	table.insert(draw_array, knight)
+	
+	draw_array = insertionSort(draw_array)
+	
+	
+	for i in pairs(draw_array) do
+		draw_array[i]:draw()
+	end
+	-- --- ---- ----- --- --
 
 	x = 0
 	y = 0
@@ -403,9 +459,12 @@ function Map.update(self, dt)
 	else
 		self.displayTitle = false
 	end
-
+	
 	for i,bullet in pairs(self.bullets) do
 		bullet:update(self, dt)
+	end
+	for i,effect in pairs(self.effects) do
+		effect:update(self, dt)
 	end
 	for i,enemy in pairs(self.enemies) do
 		enemy:update(self, dt)
@@ -433,10 +492,10 @@ function Map.paintTile(self, x, y, tile)
 end
 
 function Map.canMove(self, sprite, direction, speed)
-	if sprite.y < 1 or sprite.y > 600 then
+	if sprite.y < 32 or sprite.y > 600 then
 		return false
 	end
-	if sprite.x < 1 or sprite.x > 800 then
+	if sprite.x < 32 or sprite.x > 800 then
 		return false
 	end
 

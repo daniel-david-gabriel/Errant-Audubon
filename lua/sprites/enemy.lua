@@ -1,4 +1,5 @@
 require("lua/sprites/sprite")
+require("lua/sprites/effects/smoke")
 
 Enemy = {}
 Enemy.__index = Enemy
@@ -39,6 +40,10 @@ function Enemy.damage(self)
 end
 
 function Enemy.despawn(self, map)
+	for i=1, 8 do
+		table.insert(map.effects, Smoke(self.x+32+(math.random()*(1.5)*32)-64, self.y+32+(math.random()*32)-64))
+	end
+	
 	local toDelete
 	for i,enemy in pairs(map.enemies) do
 		if enemy == self then

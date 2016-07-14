@@ -38,7 +38,9 @@ function Hud.draw(self, knight)
 	love.graphics.rectangle("fill", 720, 15, 60, 60)
 	if knight.tool then
 		love.graphics.setColor(255, 255, 255, self.toolAlpha)
-		love.graphics.draw(images:getImage(knight.tool.imageName), 720, 15, 0, 2, 2)
+        local image = images:getImage(knight.tool.imageName)
+        love.graphics.draw(image, 720, 15, 0, 2, 2)
+		--love.graphics.draw(images:getImage(knight.tool.imageName), 720, 15, 0, 2, 2)
 	end
 end
 

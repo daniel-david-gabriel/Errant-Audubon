@@ -27,6 +27,12 @@ require("lua/sprites/enemies/bat")
 require("lua/sprites/enemies/potSpider")
 require("lua/sprites/enemies/amphora")
 require("lua/sprites/enemies/chest")
+require("lua/sprites/enemies/porol")
+require("lua/sprites/enemies/dummy")
+require("lua/sprites/enemies/aurin")
+require("lua/sprites/enemies/furotis")
+require("lua/sprites/enemies/fireball")
+
 
 Game = {}
 Game.__index = Game
@@ -49,6 +55,7 @@ function Game:_init()
 	maps = self:loadMaps()
 	--map = maps["Town-001"]
 	map = maps["Field-003"]
+	--map = maps["Debug"]
 	toMap = nil
 
 	lootGenerator = LootGenerator()
