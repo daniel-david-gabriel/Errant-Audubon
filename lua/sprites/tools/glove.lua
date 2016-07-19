@@ -60,6 +60,7 @@ end
 
 function Glove.release(self)
 	soundEffects:playSoundEffect(self.sfx)
+	--[[
 	if knight.grabbedEnemy.size == "small" then
 		if map:canMove(knight.grabbedEnemy, knight.facingDirection, 64) then
 			knight.grabbedEnemy:move(knight.facingDirection, 64)
@@ -69,6 +70,7 @@ function Glove.release(self)
 			knight:move(knight.facingDirection, 64)
 		end
 	end
+	--]]
 
 	knight.isGrabbing = false
 	knight.grabbedEnemy = nil

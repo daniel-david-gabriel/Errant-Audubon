@@ -32,6 +32,7 @@ require("lua/sprites/enemies/dummy")
 require("lua/sprites/enemies/aurin")
 require("lua/sprites/enemies/furotis")
 require("lua/sprites/enemies/fireball")
+require("lua/sprites/enemies/vine")
 
 
 Game = {}
@@ -54,10 +55,19 @@ function Game:_init()
 
 	maps = self:loadMaps()
 	--map = maps["Town-001"]
-	map = maps["Field-003"]
-	--map = maps["Debug"]
+	--map = maps["Field-001"]
+	map = maps["Debug"]
+	--map = maps["Big-Field"]
+	--map = maps["Big-Field-002"]
 	toMap = nil
-
+	
+	camera = {}
+	camera.x = 400
+	camera.y = 300
+	camera.dest_x = knight.x
+	camera.dest_y = knight.y
+	camera.quake_duration = 0
+	
 	lootGenerator = LootGenerator()
 
 	self.gameMenu = GameMenu()
@@ -65,6 +75,9 @@ end
 
 function Game.draw(self)
 	map:draw()
+	
+	-- draw hud?
+	
 	if self.dialog:isSet() then
 		self.dialog:draw()
 	elseif self.shop:isSet() then

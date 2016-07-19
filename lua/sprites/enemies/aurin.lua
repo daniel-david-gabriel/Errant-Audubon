@@ -14,7 +14,7 @@ setmetatable(Aurin, {
 })
 
 function Aurin:_init(x, y)
-	Enemy._init(self, x, y, 32, 32, "small", 6, "claw", "eye", "tuft")
+	Enemy._init(self, x, y, 32, 32, "small", 3, "claw", "eye", "tuft")
 	
 	self.speed = 6
 
@@ -29,6 +29,8 @@ function Aurin:_init(x, y)
 	
 	self.stateTimer = (math.random()*4) + 1
 	self.nextState = math.random(10)
+	
+	self.grabTimer = 0.01
 
 	self.spriteName = "aurin"
 	self.name = "aurin"
@@ -58,13 +60,41 @@ function Aurin.draw(self)
   
 	--love.graphics.print(self.spriteTimer, 200, 200)
 	--love.graphics.print((self.slide_vel_y), 200, 220)
+	
+	
+	if self:isGrabbed() then
+		love.graphics.setColor(0, 0, 255, 255)
+		love.graphics.circle("fill", (self.x+knight.x)/2 - 16, (self.y+knight.y)/2 - 16, 5)
+	end
 end
 
 function Aurin.update(self, map, dt)
   	
   	if self:collidesWith(knight) then
-		knight:knockback(self, 5)
+		knight:knockback(self, 10)
 		self.state = "stand"
+	end
+	
+	if self:isGrabbed() then
+		local grab_speed_x = self.grabTimer*math.abs(self.x - knight.x)
+		local grab_speed_y = self.grabTimer*math.abs(self.y - knight.y)
+		
+		if (self.x - knight.x) > 0 then
+			self:move("left", grab_speed_x)
+			knight:move("right", grab_speed_x)
+		else
+			self:move("right", grab_speed_x)
+			knight:move("left", grab_speed_x)
+		end
+		if (self.y - knight.y) > 0 then
+			self:move("up", grab_speed_y)
+			knight:move("down", grab_speed_y)
+		else
+			self:move("down", grab_speed_y)
+			knight:move("up", grab_speed_y)
+		end
+		
+		return
 	end
   	
 	if self.state == "approach" then
@@ -81,19 +111,19 @@ function Aurin.update(self, map, dt)
 	end
 	
 	if self.state == "side_jump" then
-		self.spriteTimer = self.spriteTimer + dt*5
+		self.spriteTimer = self.spriteTimer + dt*3
 		if self.slide_vel_x == 0 then
-			self:move("right", 6*math.cos(self.spriteTimer))
-			self:move("down", 6*math.sin(self.spriteTimer))
+			self:move("right", 5*math.cos(self.spriteTimer))
+			self:move("down", 5*math.sin(self.spriteTimer))
 		elseif self.slide_vel_x == 1 then
-			self:move("up", 6*math.sin(self.spriteTimer))
-			self:move("left", 6*math.cos(self.spriteTimer))
+			self:move("up", 5*math.sin(self.spriteTimer))
+			self:move("left", 5*math.cos(self.spriteTimer))
 		elseif self.slide_vel_x == 2 then
-			self:move("down", 6*math.cos(self.spriteTimer))
-			self:move("left", 6*math.sin(self.spriteTimer))
+			self:move("down", 5*math.cos(self.spriteTimer))
+			self:move("left", 5*math.sin(self.spriteTimer))
 		elseif self.slide_vel_x == 3 then
-			self:move("up", 6*math.cos(self.spriteTimer))
-			self:move("right", 6*math.sin(self.spriteTimer))
+			self:move("up", 5*math.cos(self.spriteTimer))
+			self:move("right", 5*math.sin(self.spriteTimer))
 		end
 		
 		if self.spriteTimer > math.pi/2 then
@@ -154,15 +184,6 @@ function Aurin.update(self, map, dt)
 	else
     	self.direction = self:determineDirection(knight)
 	end
-	  
-	--[[if knight.isGrabbing and knight.grabbedEnemy == self then
-		self.x = knight.x - 16
-		self.y = knight.y - 16
-
-		self.spriteCounter = 1
-		return
-	end
-   --]] 
 end
 
 function Aurin.isInRange(self, enemy)

@@ -145,7 +145,9 @@ function Map.createEnemy(self, enemyProperties)
 		enemy = Furotis(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
 	elseif enemyProperties[1] == "Fireball" then
 		enemy = Fireball(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
-		
+	elseif enemyProperties[1] == "Vine" then
+		enemy = Vine(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32, tonumber(enemyProperties[4]), tonumber(enemyProperties[5]))
+	
 	--Breakable Items
 	elseif enemyProperties[1] == "Amphora" then
 		enemy = Amphora(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32, enemyProperties[4])
@@ -351,18 +353,75 @@ function insertionSort(array)
 end
 
 function Map.draw(self)
+
+	love.graphics.push()
 	
-	--love.graphics.translate(-math.floor(knight.x-400), -math.floor(knight.y-300))
+	-- camera --
+	if knight.displayDirection == "down" then
+		camera.dest_x = knight.x - 16
+		camera.dest_y = knight.y + 64
+	elseif knight.displayDirection == "up" then
+		camera.dest_x = knight.x - 16
+		camera.dest_y = knight.y - 64
+	elseif knight.displayDirection == "left" then
+		camera.dest_x = knight.x - 96
+		camera.dest_y = knight.y - 16
+	else
+		camera.dest_x = knight.x + 96
+		camera.dest_y = knight.y - 16
+	end
+	
+	local map_height = table.getn(self.background)*32
+	local map_width = table.getn(self.background[1])*32
+	if camera.dest_x < 400 then
+		camera.dest_x = 400
+	end
+	if camera.dest_x > map_width - 400 then
+		camera.dest_x = map_width - 400
+	end
+	if camera.dest_y < 300 then
+		camera.dest_y = 300
+	end
+	if camera.dest_y > map_height - 300 then
+		camera.dest_y = map_height - 300
+	end
+	
+	camera.x = camera.x + (0.05)*(camera.dest_x - camera.x)
+	camera.y = camera.y + (0.05)*(camera.dest_y - camera.y)
 	
 	-- earthquake effect
-	--love.graphics.translate( math.floor((math.random()*6)-3), math.floor((math.random()*6)-3) )
-
+	if camera.quake_duration > 0 then
+		camera.quake_duration = camera.quake_duration - 1
+		camera.x = camera.x + math.floor((math.random()*12)-6)
+		camera.y = camera.y + math.floor((math.random()*12)-6)
+		if camera.x < 400 then
+			camera.x = 400
+		end
+		if camera.x > map_width - 400 then
+			camera.x = map_width - 400
+		end
+		if camera.y < 300 then
+			camera.y = 300
+		end
+		if camera.y > map_height - 300 then
+			camera.y = map_height - 300
+		end
+	end
+	
+	love.graphics.translate(-math.floor(camera.x-400), -math.floor(camera.y-300))
+	-- ------ --
+	
 	local x = 0
 	local y = 0
-
+	local screen_width = math.ceil(800/64)
+	local screen_height = math.ceil(600/64)
+	
 	for i,row in pairs(self.background) do
 		for j,tile in pairs(row) do
-			self:paintTile(x, y, tile)
+			if x <= (math.floor(camera.x/32)+screen_width)*32 and x >= (math.floor(camera.x/32)-screen_width)*32 and
+			   y <= (math.floor(camera.y/32)+screen_height)*32 and y >= (math.floor(camera.y/32)-screen_height)*32 then
+				self:paintTile(x, y, tile)
+			end
 			x= x+32
 		end
 		x = 0
@@ -412,10 +471,16 @@ function Map.draw(self)
 	draw_array = {}
 	
 	for n,enemy in pairs(self.enemies) do
-		table.insert(draw_array, enemy)
+		if enemy.x > camera.x - 400 - 32 and enemy.x < camera.x + 400 + 32 and
+		   enemy.y > camera.y - 300 - 32 and enemy.y < camera.y + 300 + 64 then
+			table.insert(draw_array, enemy)
+		end
 	end
 	for i,effect in pairs(self.effects) do
-		table.insert(draw_array, effect)
+		if effect.x > camera.x - 400 - 32 and effect.x < camera.x + 400 + 32 and
+		   effect.y > camera.y - 300 - 32 and effect.y < camera.y + 300 + 32 then
+			table.insert(draw_array, effect)
+		end
 	end
 	
 	table.insert(draw_array, knight)
@@ -433,8 +498,10 @@ function Map.draw(self)
 	for i,row in pairs(self.foreground) do
 		for j,tile in pairs(row) do
 			if not (tile == "1") then
-				
-				self:paintTile(x, y, tile)
+				if x <= (math.floor(camera.x/32)+screen_width)*32 and x >= (math.floor(camera.x/32)-screen_width)*32 and
+				   y <= (math.floor(camera.y/32)+screen_height)*32 and y >= (math.floor(camera.y/32)-screen_height)*32 then
+					self:paintTile(x, y, tile)
+				end
 			end
 			x= x+32
 		end
@@ -442,10 +509,13 @@ function Map.draw(self)
 		y = y+32
 	end
 
+	love.graphics.pop()
+	
 	if self.displayTitle then
 		love.graphics.setColor(255, 255, 255, 255)
 		love.graphics.print(self.title, 250, 10)
 	end
+	
 end
 
 function Map.update(self, dt)
@@ -467,7 +537,11 @@ function Map.update(self, dt)
 		effect:update(self, dt)
 	end
 	for i,enemy in pairs(self.enemies) do
-		enemy:update(self, dt)
+		-- only update enemies that are on screen?
+		--if enemy.x > camera.x - 400 - 32 and enemy.x < camera.x + 400 + 32 and
+		--   enemy.y > camera.y - 300 - 32 and enemy.y < camera.y + 300 + 32 then
+			enemy:update(self, dt)
+		--end
 	end
 	for i,item in pairs(self.items) do
 		item:update(self, dt)
@@ -492,10 +566,13 @@ function Map.paintTile(self, x, y, tile)
 end
 
 function Map.canMove(self, sprite, direction, speed)
-	if sprite.y < 32 or sprite.y > 600 then
+	local map_height = table.getn(self.background)*32 - 16
+	local map_width = table.getn(self.background[1])*32 - 16
+	
+	if sprite.y < 32 or sprite.y > map_height then
 		return false
 	end
-	if sprite.x < 32 or sprite.x > 800 then
+	if sprite.x < 32 or sprite.x > map_width then
 		return false
 	end
 

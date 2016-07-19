@@ -21,7 +21,7 @@ setmetatable(Knight, {
 })
 
 function Knight:_init()
-	Sprite._init(self, 9*32, 11*32, 32, 32)
+	Sprite._init(self, 400, 14*32, 32, 32)
 
 	self.hud = Hud(self)
 	self.health = 100
@@ -58,13 +58,6 @@ function Knight:_init()
     
     self.invincibility_frames = 0
 	self.slide_vel = 0
-	
-	-- save data
-	self.money = 0
-	self.area = 0
-	self.tools = self:initializeTools()
-	self.journal = self:initializeJournal()
-	self.flags = self:initializeFlags()
     
 	self.STATE = "STAND"
 	self.HOP_SPEED_MAX = 8
@@ -79,6 +72,13 @@ function Knight:_init()
 	self.SKID_COUNT = self.SKID_COUNT_MAX
 	self.dodgeDirection = 0
 	
+	-- save data
+	self.money = 0
+	self.area = 0
+	self.tools = self:initializeTools()
+	self.journal = self:initializeJournal()
+	self.flags = self:initializeFlags()
+	
     -- test text
 	--self.testText = "This is a test message to show how text can be produced one character at a time."
 	--self.testTextCounter = 0
@@ -88,25 +88,14 @@ end
 
 function Knight.draw(self)
     
-    --love.graphics.print("IcamI " .. self.delay_count, camera.x, camera.y)
-    --love.graphics.print(camera.state, camera.x, camera.y+20)
-    
 	if options.debug then
 		love.graphics.setColor(255, 0, 0, 128)
 		love.graphics.rectangle("fill", self.x-32, self.y-32, 32, 32)
-		--[[
-		love.graphics.setColor(0, 255, 255, 128)
-		love.graphics.rectangle("fill", camera.x-8, camera.y-8, 16, 16)
-		love.graphics.setColor(0, 255, 0, 128)
-		love.graphics.rectangle("fill", camera.x_destination-60, camera.y_destination-60, 120, 120)
-		love.graphics.setColor(255, 0, 255, 128)
-		love.graphics.rectangle("fill", camera.x_halfway-8, camera.y_halfway-8, 16, 16)
-		--]]
 	end
 	
 	
-	--love.graphics.setColor(0, 0, 0, 128)		-- makeshift shadow
-	--love.graphics.rectangle("fill", self.x-32, self.y-8, 32, 16)
+	love.graphics.setColor(0, 100, 100, 128)		-- makeshift shadow
+	love.graphics.ellipse("fill", self.x-16, self.y, 16, 4)
 	
 	
 	if self.invincibility_frames > 0 then			
@@ -116,6 +105,10 @@ function Knight.draw(self)
 	end
 	local sprites = images:getImage(self.spriteName)
     
+    
+	if not (self.tool == nil) then
+		self.tool:draw()
+	end
     
     if self.running and (self.facingDirection == "left" or self.facingDirection == "right") then
         if self.spriteCounter > 10 then
@@ -138,21 +131,32 @@ function Knight.draw(self)
             if self.spriteCounter > 7 then
                 self.spriteCounter = 7
             end
-            if self.freeze_direction then			
-                if (self.STATE == "DODGE" or self.STATE == "SHORT DODGE") and self.HOP_OFFSET >= 0 then
-                    love.graphics.draw(sprites["image"], sprites["quads"][self.displayDirection][self.spriteCounter], (self.x)-32, (self.y)-64-self.HOP_OFFSET)
-                else
-                    love.graphics.draw(sprites["image"], sprites["quads"][self.displayDirection][self.spriteCounter], (self.x)-32, (self.y)-64)
-                end
-            else
-                love.graphics.draw(sprites["image"], sprites["quads"][self.displayDirection][self.spriteCounter], (self.x)-32, (self.y)-64)
-            end
-        end
+			if self.freeze_direction then			
+				if (self.STATE == "DODGE" or self.STATE == "SHORT DODGE") and self.HOP_OFFSET >= 0 then
+					--love.graphics.draw(sprites["image"], sprites["quads"][self.displayDirection][self.spriteCounter], (self.x)-32, (self.y)-64-self.HOP_OFFSET)
+					local dodge_dir = 1
+					
+					if self.hop_dir == 1 or self.hop_dir == 2 or self.hop_dir == 5 or self.hop_dir == 6 then
+						if self.displayDirection == "down" or self.displayDirection == "up" then
+							dodge_dir = 2
+						end
+					end
+					if self.hop_dir == 3 or self.hop_dir == 4 or self.hop_dir == 6 or self.hop_dir == 7 then
+						if self.displayDirection == "left" or self.displayDirection == "right" then
+							dodge_dir = 2
+						end
+					end
+					
+					love.graphics.draw(sprites["image"], sprites["quads"]["dodge"][self.displayDirection][dodge_dir], (self.x)-32, (self.y)-64-self.HOP_OFFSET)
+				else
+					love.graphics.draw(sprites["image"], sprites["quads"][self.displayDirection][self.spriteCounter], (self.x)-32, (self.y)-64)
+				end
+			else
+				love.graphics.draw(sprites["image"], sprites["quads"][self.displayDirection][self.spriteCounter], (self.x)-32, (self.y)-64)
+			end
+		end
     end
     
-	if not (self.tool == nil) then
-		self.tool:draw()
-	end
     
     --[[
     if self.HOPPING then
@@ -178,8 +182,11 @@ function Knight.draw(self)
 		self.testTextCounter = self.testTextCounter + 1
 	end
     --]]
-
+	
+    love.graphics.push("all")
+	love.graphics.translate(math.floor(camera.x-400), math.floor(camera.y-300))
 	self.hud:draw(self)
+    love.graphics.pop("all")
 end
 
 function Knight.keypressed(self, key)
@@ -498,7 +505,7 @@ function Knight.update(self, dt)
                 self.STATE = "TOOL_USE"
                 self.tool_switch = 1
                 if self.hasMoved then
-                	self.slide_vel = self.speed+2
+                	self.slide_vel = self.speed
                 else
                 	self.slide_vel = 0
                 end

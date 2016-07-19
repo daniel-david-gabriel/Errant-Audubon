@@ -1,5 +1,6 @@
 require("lua/sprites/sprite")
 require("lua/sprites/effects/smoke")
+require("lua/sprites/effects/sliver")
 
 Enemy = {}
 Enemy.__index = Enemy
@@ -25,6 +26,10 @@ function Enemy:_init(x, y, width, height, size, health, common, uncommon, rare)
 end
 
 function Enemy.damage(self)
+	if math.random(100) == 1 then
+		table.insert(map.effects, Sliver(self.x-16, self.y-16))
+	end
+	
 	self.health = self.health - 1
 
 	if self.health <= 0 then

@@ -81,7 +81,7 @@ function Fireball.update(self, map, dt)
 	end
 	
 	if self.count > math.pi*2 then
-		self.count = 0
+		self.count = math.pi*2
 	else
 		self.count = self.count + math.pi*(1/100)
 	end
