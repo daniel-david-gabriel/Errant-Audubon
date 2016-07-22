@@ -9,7 +9,14 @@ require("lua/menu/loadingScreen")
 require("lua/game")
 require("lua/options")
 
-function love.load()
+local lovetest = require "test/lovetest"
+
+function love.load(arg)
+	
+	if lovetest.detect(arg) then
+		lovetest.run()
+	end
+
 	myFont = love.graphics.newImageFont("media/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?\'\"0123456789-+")
 	love.graphics.setFont(myFont)
 
