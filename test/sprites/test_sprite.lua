@@ -10,3 +10,7 @@ function test_sprite_move_down()
 
     asert_equal(sprite.x, 10)
 end
+
+function test_foo()
+    assert_true(true)
+end

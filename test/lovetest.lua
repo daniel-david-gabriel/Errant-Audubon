@@ -12,25 +12,12 @@ function lovetest.detect(args)
   return false
 end
 
-local function enumerate(dir)
-  if love.filesystem.enumerate then
-    return love.filesystem.enumerate(dir)
-  else
-    return love.filesystem.getDirectoryItems(dir)
-  end
-end
-
 -- Run the unit tests, On windows, don't quit. This allows the user to see the
 -- test results in the console
 function lovetest.run() 
   require "test/lunatest"
 
-  for _, filename in ipairs(enumerate('test')) do
-    if filename:match("^test_.*%.lua$") then
-      local testname = (filename:gsub(".lua", ""))
-      lunatest.suite("test/" .. testname)
-    end
-  end
+  lovetest.runTests("test")
 
   local opts = {verbose=true}
   local failures = lunatest.run(nil, opts)
@@ -40,6 +27,17 @@ function lovetest.run()
       os.exit(failures)
     else
       love.event.push("quit")
+    end
+  end
+end
+
+function lovetest.runTests(dir)
+  for _, filename in ipairs(love.filesystem.getDirectoryItems(dir)) do
+    if love.filesystem.isFile(dir .. "/" .. filename) and filename:match("^test_.*%.lua$") then
+      local testname = (filename:gsub(".lua", ""))
+      lunatest.suite(dir .. "/" .. testname)
+    elseif love.filesystem.isDirectory(dir .. "/" .. filename) then
+      lovetest.runTests(dir .. "/".. filename)
     end
   end
 end
