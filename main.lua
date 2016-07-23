@@ -9,28 +9,43 @@ require("lua/menu/loadingScreen")
 require("lua/game")
 require("lua/options")
 
-local lovetest = require "test/lovetest"
+function love.load(args)
 
-function love.load(arg)
-	
-	if lovetest.detect(arg) then
-		lovetest.run()
+	for _,flag in ipairs(args) do
+		print(flag)
+    	if flag == "-t" or flag == "--test" then
+    		local lovetest = require("test/lovetest")
+    		lovetest.run()
+			love.event.push("quit")
+			return
+    	elseif flag == "-m" or flag == "--map" then
+    		mapBuilder = require("lua/mapBuilder")
+    	else
+    		--unrecognized flag
+    	end
 	end
 
-	myFont = love.graphics.newImageFont("media/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?\'\"0123456789-+")
-	love.graphics.setFont(myFont)
-
+	-- Basic utils needed for game or map mode
 	keyBindings = KeyBindings()
-	options = Options()
-	mainMenu = MainMenu()
-	activeState = LoadingScreen()
-	toState = nil
+
+	if mapBuilder then
+		activeState = mapBuilder
+		love.window.setMode(1312, 600)
+	else
+		myFont = love.graphics.newImageFont("media/font.png", " ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.,!?\'\"0123456789-+")
+		love.graphics.setFont(myFont)
+
+		options = Options()
+		mainMenu = MainMenu()
+		activeState = LoadingScreen()
+		toState = nil
+	end
 end
 
 function love.draw()
 	activeState:draw()
 	
-	if options.displayFPS then
+	if options and options.displayFPS then
 		love.graphics.setColor(255, 255, 255, 255)
 		love.graphics.print(love.timer.getFPS(), 10, 10)
 	end
@@ -45,11 +60,20 @@ function love.keypressed(key)
 end
 
 function love.keyreleased(key)
-	activeState:keyreleased(key)
+	--no events triggered on key release
+	--activeState:keyreleased(key)
 end
 
 function love.mousepressed(x, y, button)
-	activeState:mousepressed(x,y,button)
+	if mapBuilder then
+		activeState:mousepressed(x,y,button)
+	end
+end
+
+function love.wheelmoved(x, y)
+	if mapBuilder then
+		activeState:wheelmoved(x, y)
+	end
 end
 
 function love.update(dt)

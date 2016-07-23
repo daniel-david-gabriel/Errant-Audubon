@@ -1,10 +1,11 @@
 require("lua/utils")
+require("lua/persistence/persistence")
 
 Map = {}
 Map.__index = Map
 
 setmetatable(Map, {
-  __index = Map,
+  __index = Persistence,
   __call = function (cls, ...)
     local self = setmetatable({}, cls)
     self:_init(...)
@@ -13,6 +14,8 @@ setmetatable(Map, {
 })
 
 function Map:_init(mapName)
+	Persistence._init(self, "media/maps/" .. mapName)
+
 	self.mapName = mapName
 
 	self.tileset = self:loadTileset(mapName)
