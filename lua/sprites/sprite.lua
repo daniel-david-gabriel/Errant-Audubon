@@ -22,6 +22,11 @@ end
 function Sprite.move(self, direction, speed)
 	local newX = self.x
 	local newY = self.y
+	
+	if speed < 0 then
+		speed = math.abs(speed)
+		direction = oppositeDirection(direction)
+	end
 
 	if direction == "up" then
 		newY = newY - speed
@@ -40,7 +45,8 @@ function Sprite.move(self, direction, speed)
 	local collisionSprite = Sprite(newX, newY, 32, 32)
 	if self == knight then
 		for k,enemy in pairs(map.enemies) do
-			if (not Enemy.isGrabbed(enemy)) and collisionSprite:collidesWith(enemy) then
+			if (not (Enemy.isGrabbed(enemy) or (enemy.name == "bigslime" and enemy.jumpOffset > 0)))
+			   and collisionSprite:collidesWith(enemy) then
 				return false
 			end
 		end

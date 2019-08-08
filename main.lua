@@ -8,8 +8,10 @@ require("lua/menu/mainMenu")
 require("lua/menu/loadingScreen")
 require("lua/game")
 require("lua/options")
+json = require "json"
 
 function love.load(args)
+    shader = love.graphics.newShader("shader.fs")
 
 	for _,flag in ipairs(args) do
 		print(flag)
@@ -61,7 +63,7 @@ end
 
 function love.keyreleased(key)
 	--no events triggered on key release
-	--activeState:keyreleased(key)
+	activeState:keyreleased(key)
 end
 
 function love.mousepressed(x, y, button)

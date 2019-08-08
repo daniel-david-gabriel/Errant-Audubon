@@ -84,6 +84,11 @@ function Bigslime.update(self, map, dt)
 				self.jumpOffset = 0
 				self.jumpVel = self.jumpVelMax
 				self.jumpCounter = 0
+				
+				local collision_sprite = Sprite(self.x, self.y, 100, 100)
+				if collision_sprite:collidesWith(knight) then
+					knight:knockback(self, 40)
+				end
 				return
 			end
 		end

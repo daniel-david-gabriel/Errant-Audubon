@@ -33,6 +33,7 @@ require("lua/sprites/enemies/aurin")
 require("lua/sprites/enemies/furotis")
 require("lua/sprites/enemies/fireball")
 require("lua/sprites/enemies/vine")
+require("lua/sprites/enemies/wallspider")
 
 
 Game = {}
@@ -68,8 +69,13 @@ function Game:_init()
 	camera.dest_y = knight.y
 	camera.quake_duration = 0
 	
+	hitStopTimer = 0
+	
 	lootGenerator = LootGenerator()
-
+	
+	leftxDir = 0
+	leftyDir = 0
+	
 	self.gameMenu = GameMenu()
 end
 
@@ -105,6 +111,18 @@ function Game.keyreleased(self, key )
 	knight:keyreleased(key)
 end
 
+function love.gamepadpressed(joystick, button)
+	if button == "a" then
+		knight:keypressed(keyBindings:getTool())
+	end
+end
+
+function love.gamepadreleased(joystick, button)
+	if button == "a" then
+		knight:keyreleased(keyBindings:getTool())
+	end
+end
+
 function Game.mousepressed(self, x, y, button)
 	--noop
 end
@@ -115,15 +133,29 @@ function Game.update(self, dt)
 		map = toMap
 		toMap = nil
 	end
-
-	knight:update(dt)
-	map:update(dt)
-
+	
+	-- pause stuff a little when hitting enemies for effect
+	if hitStopTimer > 0 then
+		hitStopTimer = hitStopTimer - 1
+	end
+	
+	if (hitStopTimer % 10) == 0 then
+		knight:update(dt)
+		map:update(dt)
+	end
+	-- --
+	
 	if self.dialog:isSet() then
 		self.dialog:update()
 	elseif self.shop:isSet() then
 		self.shop:update()
 	end
+	
+	-- i have no idea what i'm doing --
+	local joysticks = love.joystick.getJoysticks()
+    for i, joystick in ipairs(joysticks) do
+		leftxDir, leftyDir = joystick:getAxes( )
+    end
 end
 
 function Game.loadMaps(self)

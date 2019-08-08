@@ -22,8 +22,10 @@ function KeyBindings:_init()
 	self.bindings["left"] = "left"
 	self.bindings["right"] = "right"
 	self.bindings["menu"] = "return"
-	self.bindings["tool"] = "z"
-	self.bindings["subtool"] = "x"
+	self.bindings["tool"] = "x"
+	self.bindings["subtool"] = "z"
+	self.bindings["shift"] = "lshift"
+	self.bindings["space"] = "lctrl"
 
 	if love.filesystem.exists(self.bindingsFilename) then
 		self:loadBindings()
@@ -61,6 +63,15 @@ end
 function KeyBindings.getTool(self)
 	return self.bindings["tool"]
 end
+
+function KeyBindings.getShift(self)
+	return self.bindings["shift"]
+end
+
+function KeyBindings.getSpace(self)
+	return self.bindings["space"]
+end
+
 
 function KeyBindings.loadBindings(self)
 	local bindingsFileLines = love.filesystem.lines(self.bindingsFilename)

@@ -14,6 +14,8 @@ setmetatable(Images, {
 function Images:_init()
 	self.images = {}
     
+	self.images["attackHurt"] = self:loadSprite("attack_hurt", "media/sprites/effects/attack_hurt.png")
+	
 	self.images["dust"] = self:loadDust()
 	self.images["SleepyZ"] = self:loadSleepyZ()
 	self.images["Spark"] = self:loadSpark()
@@ -54,12 +56,14 @@ function Images:_init()
 	self.images["tuft"] = love.graphics.newImage("media/sprites/items/tuft.png")
 	self.images["slimeball"] = love.graphics.newImage("media/sprites/items/slime.png")
 	
+	-- tools in inventory
 	self.images["sword"] = love.graphics.newImage("media/menu/tools/sword.png")
 	self.images["sword"]:setFilter("nearest", "nearest")
 	self.images["glove"] = love.graphics.newImage("media/menu/tools/glove.png")
 	self.images["shield"] = love.graphics.newImage("media/menu/tools/shield.png")
 	
-	self.images["sword weapon"] = self:loadSword()
+	
+	self.images["sword weapon"] = self:loadSprite("sword_weapon", "media/sprites/sword-weapon.png")
 	
 	self.images["circle"] = love.graphics.newImage("media/sprites/circle.png")
 	
@@ -67,6 +71,7 @@ function Images:_init()
 	self.images["chest"] = love.graphics.newImage("media/sprites/enemies/chest.png")
 
 	self.images["audubon"] = self:loadAudubon()
+	self.images["attackHit"] = self:loadSprite("attackHit", "media/sprites/effects/attackhit.png")
 end
 
 function Images.getImage(self, imageName)
@@ -355,6 +360,7 @@ end
 function Images.loadFurotis()
 	local sprites = {}
 	sprites["image"] = love.graphics.newImage("media/sprites/enemies/Furotis.png")
+	sprites["image"]:setFilter("nearest", "nearest")
 
 	local quads = {}
 	
@@ -410,8 +416,10 @@ function Images.loadVine()
     sprites["image"]:setFilter("nearest", "nearest")
 	
 	local quads = {}
-	quads[1] = love.graphics.newQuad(0, 0, 32, 32, 64, 32)
-	quads[2] = love.graphics.newQuad(32, 0, 32, 32, 64, 32)
+	quads[1] = love.graphics.newQuad(0, 0, 16, 16, 32, 16)
+	quads[2] = love.graphics.newQuad(16, 0, 16, 16, 32, 16)
+	--quads[1] = love.graphics.newQuad(0, 0, 32, 32, 64, 32)
+	--quads[2] = love.graphics.newQuad(32, 0, 32, 32, 64, 32)
 	
 	sprites["quads"] = quads
 	
@@ -494,56 +502,7 @@ function Images.loadBigslime()
 	local sprites = {}
 	sprites["image"] = love.graphics.newImage("media/sprites/enemies/bigslime.png")
     sprites["image"]:setFilter("nearest", "nearest")
-
-	local quads = {}
-	
-	local down = {}
-	down[1] = love.graphics.newQuad(0, 0, 64, 64, 576, 256)
-	down[2] = love.graphics.newQuad(64, 0, 64, 64, 576, 256)
-	down[3] = love.graphics.newQuad(128, 0, 64, 64, 576, 256)
-	down[4] = love.graphics.newQuad(192, 0, 64, 64, 576, 256)
-	down[5] = love.graphics.newQuad(256, 0, 64, 64, 576, 256)
-	
-	local up = {}
-	up[1] = love.graphics.newQuad(0, 64, 64, 64, 576, 256)
-	up[2] = love.graphics.newQuad(64, 64, 64, 64, 576, 256)
-	up[3] = love.graphics.newQuad(128, 64, 64, 64, 576, 256)
-	up[4] = love.graphics.newQuad(192, 64, 64, 64, 576, 256)
-	up[5] = love.graphics.newQuad(256, 64, 64, 64, 576, 256)
-	
-	local left = {}
-	left[1] = love.graphics.newQuad(0, 128, 64, 64, 576, 256)
-	left[2] = love.graphics.newQuad(64, 128, 64, 64, 576, 256)
-	left[3] = love.graphics.newQuad(128, 128, 64, 64, 576, 256)
-	left[4] = love.graphics.newQuad(192, 128, 64, 64, 576, 256)
-	left[5] = love.graphics.newQuad(256, 128, 64, 64, 576, 256)
-    
-	local right = {}
-	right[1] = love.graphics.newQuad(0, 192, 64, 64, 576, 256)
-	right[2] = love.graphics.newQuad(64, 192, 64, 64, 576, 256)
-	right[3] = love.graphics.newQuad(128, 192, 64, 64, 576, 256)
-	right[4] = love.graphics.newQuad(192, 192, 64, 64, 576, 256)
-	right[5] = love.graphics.newQuad(256, 192, 64, 64, 576, 256)
-	
-	local jump_down = {}
-	jump_down[1] = love.graphics.newQuad(320, 0, 64, 64, 576, 256)
-	jump_down[2] = love.graphics.newQuad(384, 0, 64, 64, 576, 256)
-	jump_down[3] = love.graphics.newQuad(448, 0, 64, 64, 576, 256)
-	jump_down[4] = love.graphics.newQuad(512, 0, 64, 64, 576, 256)
-	
-	local jump = {}
-	jump["down"] = jump_down
-	jump["up"] = jump_down
-	jump["right"] = jump_down
-	jump["left"] = jump_down
-	
-	quads["jump"] = jump
-	quads["down"] = down
-	quads["up"] = up
-	quads["left"] = left
-	quads["right"] = right
-    
-	sprites["quads"] = quads
+	sprites["quads"] = getQuadsFromSlices("bigSlime", sprites["image"]:getWidth(), sprites["image"]:getHeight())
 	
 	return sprites
 end
@@ -704,169 +663,61 @@ function Images.loadAudubon(self)
 	local sprites = {}
 	sprites["image"] = love.graphics.newImage("media/sprites/audubon.png")
     sprites["image"]:setFilter("nearest", "nearest")
-    
-	local quads = {}
-	local down = {}
-	down[1] = love.graphics.newQuad(0, 0, 32, 64, 960, 320)
-	down[2] = love.graphics.newQuad(32, 0, 32, 64, 960, 320)
-	down[3] = love.graphics.newQuad(64, 0, 32, 64, 960, 320)
-	down[4] = love.graphics.newQuad(96, 0, 32, 64, 960, 320)
-	down[5] = love.graphics.newQuad(128, 0, 32, 64, 960, 320)
-	down[6] = love.graphics.newQuad(160, 0, 32, 64, 960, 320)
-	down[7] = love.graphics.newQuad(192, 0, 32, 64, 960, 320)
-
-	local up = {}
-	up[1] = love.graphics.newQuad(0, 64, 32, 64, 960, 320)
-	up[2] = love.graphics.newQuad(32, 64, 32, 64, 960, 320)
-	up[3] = love.graphics.newQuad(64, 64, 32, 64, 960, 320)
-	up[4] = love.graphics.newQuad(96, 64, 32, 64, 960, 320)
-	up[5] = love.graphics.newQuad(128, 64, 32, 64, 960, 320)
-	up[6] = love.graphics.newQuad(160, 64, 32, 64, 960, 320)
-	up[7] = love.graphics.newQuad(192, 64, 32, 64, 960, 320)
-
-	local left = {}
-	left[1] = love.graphics.newQuad(0, 128, 32, 64, 960, 320)
-	left[2] = love.graphics.newQuad(32, 128, 32, 64, 960, 320)
-	left[3] = love.graphics.newQuad(64, 128, 32, 64, 960, 320)
-	left[4] = love.graphics.newQuad(96, 128, 32, 64, 960, 320)
-	left[5] = love.graphics.newQuad(128, 128, 32, 64, 960, 320)
-	left[6] = love.graphics.newQuad(160, 128, 32, 64, 960, 320)
-	left[7] = love.graphics.newQuad(192, 128, 32, 64, 960, 320)
-
-	local right = {}
-	right[1] = love.graphics.newQuad(0, 192, 32, 64, 960, 320)
-	right[2] = love.graphics.newQuad(32, 192, 32, 64, 960, 320)
-	right[3] = love.graphics.newQuad(64, 192, 32, 64, 960, 320)
-	right[4] = love.graphics.newQuad(96, 192, 32, 64, 960, 320)
-	right[5] = love.graphics.newQuad(128, 192, 32, 64, 960, 320)
-	right[6] = love.graphics.newQuad(160, 192, 32, 64, 960, 320)
-	right[7] = love.graphics.newQuad(192, 192, 32, 64, 960, 320)
-    
-    local tool_use = {}
-    local tool_use_down = {}
-	tool_use_down[1] = love.graphics.newQuad(224, 0, 32, 64, 960, 320)
-	tool_use_down[2] = love.graphics.newQuad(256, 0, 32, 64, 960, 320)
-	tool_use_down[3] = love.graphics.newQuad(288, 0, 32, 64, 960, 320)
-    local tool_use_up = {}
-    tool_use_up[1] = love.graphics.newQuad(224, 64, 32, 64, 960, 320)
-    tool_use_up[2] = love.graphics.newQuad(256, 64, 32, 64, 960, 320)
-    tool_use_up[3] = love.graphics.newQuad(288, 64, 32, 64, 960, 320)
-    local tool_use_left = {}
-    tool_use_left[1] = love.graphics.newQuad(224, 128, 32, 64, 960, 320)
-    tool_use_left[2] = love.graphics.newQuad(256, 128, 32, 64, 960, 320)
-    tool_use_left[3] = love.graphics.newQuad(288, 128, 32, 64, 960, 320)
-    local tool_use_right = {}
-    tool_use_right[1] = love.graphics.newQuad(224, 192, 32, 64, 960, 320)
-    tool_use_right[2] = love.graphics.newQuad(256, 192, 32, 64, 960, 320)
-    tool_use_right[3] = love.graphics.newQuad(288, 192, 32, 64, 960, 320)
-		
-	tool_use["down"] = tool_use_down
-    tool_use["up"] = tool_use_up
-	tool_use["left"] = tool_use_left
-    tool_use["right"] = tool_use_right
-    
-    local run_right = {}
-    run_right[1] = love.graphics.newQuad(320, 192, 64, 64, 960, 320)
-    run_right[2] = love.graphics.newQuad(384, 192, 64, 64, 960, 320)
-    run_right[3] = love.graphics.newQuad(448, 192, 64, 64, 960, 320)
-    run_right[4] = love.graphics.newQuad(512, 192, 64, 64, 960, 320)
-    run_right[5] = love.graphics.newQuad(576, 192, 64, 64, 960, 320)
-    run_right[6] = love.graphics.newQuad(640, 192, 64, 64, 960, 320)
-    run_right[7] = love.graphics.newQuad(704, 192, 64, 64, 960, 320)
-    run_right[8] = love.graphics.newQuad(768, 192, 64, 64, 960, 320)
-    run_right[9] = love.graphics.newQuad(832, 192, 64, 64, 960, 320)
-    run_right[10] = love.graphics.newQuad(896, 192, 64, 64, 960, 320)
-    
-    local run_left = {}
-    run_left[1] = love.graphics.newQuad(320, 128, 64, 64, 960, 320)
-    run_left[2] = love.graphics.newQuad(384, 128, 64, 64, 960, 320)
-    run_left[3] = love.graphics.newQuad(448, 128, 64, 64, 960, 320)
-    run_left[4] = love.graphics.newQuad(512, 128, 64, 64, 960, 320)
-    run_left[5] = love.graphics.newQuad(576, 128, 64, 64, 960, 320)
-    run_left[6] = love.graphics.newQuad(640, 128, 64, 64, 960, 320)
-    run_left[7] = love.graphics.newQuad(704, 128, 64, 64, 960, 320)
-    run_left[8] = love.graphics.newQuad(768, 128, 64, 64, 960, 320)
-    run_left[9] = love.graphics.newQuad(832, 128, 64, 64, 960, 320)
-    run_left[10] = love.graphics.newQuad(896, 128, 64, 64, 960, 320)
-    
-    local dodge = {}
-    local dodge_down = {}
-    dodge_down[1] = love.graphics.newQuad(0, 256, 32, 64, 960, 320)
-    dodge_down[2] = love.graphics.newQuad(32, 256, 32, 64, 960, 320)
-    local dodge_up = {}
-    dodge_up[1] = love.graphics.newQuad(64, 256, 32, 64, 960, 320)
-    dodge_up[2] = love.graphics.newQuad(96, 256, 32, 64, 960, 320)
-    local dodge_left = {}
-    dodge_left[1] = love.graphics.newQuad(128, 256, 32, 64, 960, 320)
-    dodge_left[2] = love.graphics.newQuad(160, 256, 32, 64, 960, 320)
-    local dodge_right = {}
-    dodge_right[1] = love.graphics.newQuad(192, 256, 32, 64, 960, 320)
-    dodge_right[2] = love.graphics.newQuad(224, 256, 32, 64, 960, 320)
-    
-    dodge["down"] = dodge_down
-    dodge["up"] = dodge_up
-    dodge["left"] = dodge_left
-    dodge["right"] = dodge_right
-    
-    
-	quads["down"] = down
-	quads["up"] = up
-	quads["left"] = left
-	quads["right"] = right
-	quads["tool_use"] = tool_use
-	quads["run_left"] = run_left
-	quads["run_right"] = run_right
-	quads["dodge"] = dodge
-
-	sprites["quads"] = quads
-
-	return sprites
-end
-
-function Images.loadSword(self)
-	local sprites = {}
-    sprites["image"] = love.graphics.newImage("media/sprites/sword-weapon.png")
-    sprites["image"]:setFilter("nearest", "nearest")
-	local quads = {}
-    
-	local down = {}
-	down[1] = love.graphics.newQuad(0, 0, 32, 32, 256, 128)
-	down[2] = love.graphics.newQuad(32, 0, 32, 32, 256, 128)
-	down[3] = love.graphics.newQuad(64, 0, 32, 32, 256, 128)
-	down[4] = love.graphics.newQuad(96, 0, 32, 32, 256, 128)
-	down[5] = love.graphics.newQuad(128, 0, 64, 64, 256, 128)
-	down[6] = love.graphics.newQuad(192, 0, 64, 64, 256, 128)
-    
-	local up = {}
-	up[1] = love.graphics.newQuad(0, 32, 32, 32, 256, 128)
-	up[2] = love.graphics.newQuad(32, 32, 32, 32, 256, 128)
-	up[3] = love.graphics.newQuad(64, 32, 32, 32, 256, 128)
-	up[4] = love.graphics.newQuad(96, 32, 32, 32, 256, 128)
-	up[5] = love.graphics.newQuad(128, 0, 64, 64, 256, 128)
-	up[6] = love.graphics.newQuad(192, 0, 64, 64, 256, 128)
-    
-	local left = {}
-	left[1] = love.graphics.newQuad(0, 64, 32, 32, 256, 128)
-	left[2] = love.graphics.newQuad(32, 64, 32, 32, 256, 128)
-	left[3] = love.graphics.newQuad(64, 64, 32, 32, 256, 128)
-	left[4] = love.graphics.newQuad(96, 64, 32, 32, 256, 128)
-	left[5] = love.graphics.newQuad(128, 0, 64, 64, 256, 128)
-	left[6] = love.graphics.newQuad(192, 0, 64, 64, 256, 128)
+	sprites["quads"] = getQuadsFromSlices("audubon", sprites["image"]:getWidth(), sprites["image"]:getHeight())
 	
-	local right = {}
-	right[1] = love.graphics.newQuad(0, 96, 32, 32, 256, 128)
-	right[2] = love.graphics.newQuad(32, 96, 32, 32, 256, 128)
-	right[3] = love.graphics.newQuad(64, 96, 32, 32, 256, 128)
-	right[4] = love.graphics.newQuad(96, 96, 32, 32, 256, 128)
-	right[5] = love.graphics.newQuad(128, 0, 64, 64, 256, 128)
-	right[6] = love.graphics.newQuad(192, 0, 64, 64, 256, 128)
-    
-	quads["down"] = down
-	quads["up"] = up
-	quads["left"] = left
-	quads["right"] = right
-    
-	sprites["quads"] = quads
 	return sprites
-
 end
+
+function Images.loadSprite(self, name, img)
+	local sprites = {}
+	sprites["image"] = love.graphics.newImage(img)
+    sprites["image"]:setFilter("nearest", "nearest")
+	sprites["quads"] = getQuadsFromSlices(name, sprites["image"]:getWidth(), sprites["image"]:getHeight())
+	
+	return sprites
+end
+
+function getQuadsFromSlices(spriteName, imgWidth, imgHeight)
+	local quads = {}
+	local myTables = split(love.filesystem.read("media/sprites/slices/" .. spriteName), "%S+")
+	local arr = json.decode(myTables[1])
+	local arrNames = json.decode(myTables[2])
+	
+	for i=1,table.getn(arrNames) do
+    	local newTable = {}
+    	if table.getn(arrNames[i]) > 1 then			--sub groups
+    		for index,value in ipairs(arr[i]) do
+    			local newTable2 = {}
+    			for index2,value2 in ipairs(value) do
+    				newTable2[index2] = love.graphics.newQuad(value2[1], value2[2], value2[3], value2[4], imgWidth, imgHeight);
+    			end
+    			newTable[arrNames[i][index+1]] = newTable2
+    		end
+    		quads[arrNames[i][1]] = newTable 
+    		
+    	else										--no sub groups
+    		for index,value in ipairs(arr[i]) do
+    			newTable[index] = love.graphics.newQuad(value[1], value[2], value[3], value[4], imgWidth, imgHeight)
+    		end
+    		quads[arrNames[i][1]] = newTable 
+    	end
+    end
+    
+    return quads
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

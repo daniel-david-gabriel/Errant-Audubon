@@ -150,7 +150,9 @@ function Map.createEnemy(self, enemyProperties)
 		enemy = Fireball(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
 	elseif enemyProperties[1] == "Vine" then
 		enemy = Vine(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32, tonumber(enemyProperties[4]), tonumber(enemyProperties[5]))
-	
+	elseif enemyProperties[1] == "WallSpider" then
+		enemy = WallSpider(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32)
+
 	--Breakable Items
 	elseif enemyProperties[1] == "Amphora" then
 		enemy = Amphora(tonumber(enemyProperties[2])*32, tonumber(enemyProperties[3])*32, enemyProperties[4])
@@ -359,19 +361,48 @@ function Map.draw(self)
 
 	love.graphics.push()
 	
+    --love.graphics.setShader(shader)
+    --shader:send("screen", {love.graphics.getWidth(), love.graphics.getHeight()})
+    
+	local temp = false
+	
+	if knight.STATE == "WALL_CLING" then
+		temp = true
+	end
+	
 	-- camera --
 	if knight.displayDirection == "down" then
-		camera.dest_x = knight.x - 16
-		camera.dest_y = knight.y + 64
+		if temp then
+			camera.dest_x = knight.x - 16
+			camera.dest_y = knight.y + 204
+		else
+			camera.dest_x = knight.x - 16
+			camera.dest_y = knight.y + 64
+		end
 	elseif knight.displayDirection == "up" then
-		camera.dest_x = knight.x - 16
-		camera.dest_y = knight.y - 64
+		if temp then
+			camera.dest_x = knight.x - 16
+			camera.dest_y = knight.y - 204
+		else
+			camera.dest_x = knight.x - 16
+			camera.dest_y = knight.y - 64
+		end
 	elseif knight.displayDirection == "left" then
-		camera.dest_x = knight.x - 96
-		camera.dest_y = knight.y - 16
+		if temp then
+			camera.dest_x = knight.x - 236
+			camera.dest_y = knight.y - 16
+		else
+			camera.dest_x = knight.x - 96
+			camera.dest_y = knight.y - 16
+		end
 	else
-		camera.dest_x = knight.x + 96
-		camera.dest_y = knight.y - 16
+		if temp then
+			camera.dest_x = knight.x + 236
+			camera.dest_y = knight.y - 16
+		else
+			camera.dest_x = knight.x + 96
+			camera.dest_y = knight.y - 16
+		end
 	end
 	
 	local map_height = table.getn(self.background)*32
@@ -389,8 +420,10 @@ function Map.draw(self)
 		camera.dest_y = map_height - 300
 	end
 	
-	camera.x = camera.x + (0.05)*(camera.dest_x - camera.x)
-	camera.y = camera.y + (0.05)*(camera.dest_y - camera.y)
+	local move_percent = 0.05
+	
+	camera.x = camera.x + move_percent*(camera.dest_x - camera.x)
+	camera.y = camera.y + move_percent*(camera.dest_y - camera.y)
 	
 	-- earthquake effect
 	if camera.quake_duration > 0 then
@@ -414,22 +447,33 @@ function Map.draw(self)
 	love.graphics.translate(-math.floor(camera.x-400), -math.floor(camera.y-300))
 	-- ------ --
 	
-	local x = 0
-	local y = 0
-	local screen_width = math.ceil(800/64)
-	local screen_height = math.ceil(600/64)
+	local map_height = table.getn(self.background)
+	local map_width = table.getn(self.background[1])
+	local camera_top_corner_x = math.floor((camera.x - 400)/32)
+	local camera_top_corner_y = math.floor((camera.y - 300)/32)
+	local x = camera_top_corner_x*32
+	local y = camera_top_corner_y*32
 	
-	for i,row in pairs(self.background) do
-		for j,tile in pairs(row) do
-			if x <= (math.floor(camera.x/32)+screen_width)*32 and x >= (math.floor(camera.x/32)-screen_width)*32 and
-			   y <= (math.floor(camera.y/32)+screen_height)*32 and y >= (math.floor(camera.y/32)-screen_height)*32 then
-				self:paintTile(x, y, tile)
-			end
-			x= x+32
-		end
-		x = 0
-		y = y+32
+	local a = 19
+	local b = 25
+	
+	if map_height >= 20 then
+		a = 20
 	end
+	if map_width >= 26 then
+		b = 26
+	end
+	
+	for i=camera_top_corner_y+1, camera_top_corner_y + a do
+		for j=camera_top_corner_x+1, camera_top_corner_x + b do
+			self:paintTile(x, y, self.background[i][j])
+			x = x + 32
+		end
+		x = camera_top_corner_x*32
+		y = y + 32
+	end
+	
+    love.graphics.setShader()
 
 	for i,bullet in pairs(self.bullets) do
 		bullet:draw()
@@ -495,7 +539,8 @@ function Map.draw(self)
 		draw_array[i]:draw()
 	end
 	-- --- ---- ----- --- --
-
+	
+	--[[
 	x = 0
 	y = 0
 	for i,row in pairs(self.foreground) do
@@ -511,7 +556,8 @@ function Map.draw(self)
 		x = 0
 		y = y+32
 	end
-
+	--]]
+	
 	love.graphics.pop()
 	
 	if self.displayTitle then
@@ -572,13 +618,6 @@ function Map.canMove(self, sprite, direction, speed)
 	local map_height = table.getn(self.background)*32 - 16
 	local map_width = table.getn(self.background[1])*32 - 16
 	
-	if sprite.y < 32 or sprite.y > map_height then
-		return false
-	end
-	if sprite.x < 32 or sprite.x > map_width then
-		return false
-	end
-
 	local validTiles = {}
 	if sprite == knight then
 		validTiles = tiles:getPlayerTiles(self.tileset)
@@ -608,6 +647,11 @@ function Map.canMove(self, sprite, direction, speed)
 		yPos = math.floor((sprite.y+4) / 32)
 		yPos2 = math.floor((sprite.y+28) / 32)
 	end
+	
+	if xPos <= 0 or xPos > table.getn(self.background[1]) or yPos <= 0 or yPos > table.getn(self.background) then
+		return false
+	end
+	
 	
 	local box1Valid = false
 	for k,v in pairs(validTiles) do

@@ -1,6 +1,8 @@
 require("lua/sprites/sprite")
 require("lua/sprites/effects/smoke")
 require("lua/sprites/effects/sliver")
+require("lua/sprites/effects/attackHit")
+require("lua/sprites/effects/attack_hurt")
 
 Enemy = {}
 Enemy.__index = Enemy
@@ -26,6 +28,13 @@ function Enemy:_init(x, y, width, height, size, health, common, uncommon, rare)
 end
 
 function Enemy.damage(self)
+	
+	table.insert(map.effects, attackHurt(self.x-(self.width/2)+(math.random(16)-8), self.y+32))
+	table.insert(map.effects, attackHurt(self.x-(self.width/2)+(math.random(16)-8), self.y+32))
+	table.insert(map.effects, attackHurt(self.x-(self.width/2)+(math.random(16)-8), self.y+32))
+	table.insert(map.effects, attackHurt(self.x-(self.width/2)+(math.random(16)-8), self.y+32))
+	
+	-- slivers of magic sometimes come off enemies
 	if math.random(100) == 1 then
 		table.insert(map.effects, Sliver(self.x-16, self.y-16))
 	end

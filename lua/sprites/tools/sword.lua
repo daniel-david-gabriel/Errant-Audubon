@@ -14,7 +14,7 @@ setmetatable(Sword, {
 })
 
 function Sword:_init()
-	Sprite._init(self, 0, 0, 32, 32)
+	Sprite._init(self, 0, 0, 64, 64)
 
 	self.imageName = "sword"
 	self.name = "sword weapon"
@@ -23,66 +23,55 @@ function Sword:_init()
 	self.attackAnimation = 1
 	self.facingDirection = "down"
 	self.enemiesHit = {}
+	
+	self.timer_max = 40
+	self.timer = self.timer_max
+	
+	self.xSpeed = 0
+	self.ySpeed = 0
+	
+	self.xRand = math.random(10) - 5
+	self.yRand = math.random(10) - 5
 end
 
 function Sword.use(self, knight)
 	self.beingUsed = true
-
+	
+	--[[
+	local moveAngle = math.atan2(knight.ySpeed, knight.xSpeed)
+	if knight.xSpeed == 0 and knight.ySpeed == 0 then
+		if knight.displayDirection == "down" then
+			moveAngle = (1/2)*math.pi
+		elseif knight.displayDirection == "left" then
+			moveAngle = math.pi
+		elseif knight.displayDirection == "up" then
+			moveAngle = (3/2)*math.pi
+		end
+	end
+	
+	self.x = knight.x - 16 + 50 * math.cos(moveAngle)
+	self.y = knight.y - 16 + 50 * math.sin(moveAngle)
+	--]]
+	
+    
 	self.x = knight.x
 	self.y = knight.y
 	self.facingDirection = knight.displayDirection
-    --[[
+    
 	if knight.displayDirection == "up" then
-		self.y = self.y - 32
+		self.y = self.y - self.height
+		self.x = self.x - (self.width/4)
 	elseif knight.displayDirection == "down" then
-		self.y = self.y + 32
+		self.y = self.y + (self.height/2)
+		self.x = self.x - (self.width/4)
 	elseif knight.displayDirection == "left" then
-		self.x = self.x - 32
+		self.y = self.y - (self.height/4)
+		self.x = self.x - self.width
 	elseif knight.displayDirection == "right" then
-		self.x = self.x + 32
+		self.y = self.y - (self.height/4)
+		self.x = self.x + (self.width/2)
 	end
-    --]]
-    
-    positions = {}
-    
-    down = {}
-    down["x"] = {30, -10, -30, -33, 0}
-    down["y"] = {19, 22, 11, -20, 36}
-    up = {}
-    up["x"] = {-30, -10, 30, 33, 0}
-    up["y"] = {-24, -32, -21, -10, -44}
-    left = {}
-    left["x"] = {-20, -30, -20, 0, -42}
-    left["y"] = {11, -18, -30, -35, 0}
-    right = {}
-    right["x"] = {20, 30, 20, 0, 42}
-    right["y"] = {11, -18, -30, -35, 0}
-    
-    positions["down"] = down
-    positions["up"] = up
-    positions["left"] = left
-    positions["right"] = right
-    
-    if knight.STATE == "TOOL_USE" then
-        if knight.tool_timer >= knight.tool_timer_max*(2/3) + 2 and knight.tool_timer <= knight.tool_timer_max then
-            self.x = self.x + positions[self.facingDirection]["x"][1]
-            self.y = self.y + positions[self.facingDirection]["y"][1]
-        elseif knight.tool_timer >= (knight.tool_timer_max/3) + 2 and knight.tool_timer < knight.tool_timer_max*(2/3) + 2 then
-            self.x = self.x + positions[self.facingDirection]["x"][2]
-            self.y = self.y + positions[self.facingDirection]["y"][2]
-        elseif knight.tool_timer > 0 and knight.tool_timer < (knight.tool_timer_max/3) + 2 then
-            self.x = self.x + positions[self.facingDirection]["x"][3]
-            self.y = self.y + positions[self.facingDirection]["y"][3]
-        end
-    else
-        if knight.STATE == "SWORD_SLASH" then
-            self.x = self.x + positions[self.facingDirection]["x"][5]
-            self.y = self.y + positions[self.facingDirection]["y"][5]
-        elseif knight.freeze_direction == true and knight.tool_timer == 0 then
-            self.x = self.x + positions[self.facingDirection]["x"][4]
-            self.y = self.y + positions[self.facingDirection]["y"][4]
-        end
-    end
+	
     
     if knight.HOP_OFFSET >= 0 then
 		self.y = self.y - knight.HOP_OFFSET
@@ -91,12 +80,17 @@ end
 
 function Sword.draw(self)
 	
-	if options.debug and self.beingUsed then
-		love.graphics.setColor(0, 255, 0, 128)
-		love.graphics.rectangle("fill", self.x-32, self.y-32, 32, 32)
-	end
+	--if self.beingUsed then
+		if knight.STATE == "SWORD_SLASH" then
+			love.graphics.setColor(255, 0, 0, 128)
+			love.graphics.rectangle("fill", self.x-(self.width/2), self.y-(self.height/2), self.width, self.height)
+		else
+			love.graphics.setColor(0, 255, 0, 128)
+			love.graphics.rectangle("fill", self.x-(self.width/2), self.y-(self.height/2), self.width, self.height)
+		end
+	--end
 
-	if self.beingUsed then
+	--[[if self.beingUsed then
 		--love.graphics.draw(images:getImage(self.imageName), self.x-32, self.y-32)
         love.graphics.setColor(255, 255, 255, 255)
         local sprites = images:getImage(self.name)
@@ -122,9 +116,52 @@ function Sword.draw(self)
             end
         end
 	end
+    --]]
 end
 
 function Sword.update(self, dt)
+	self:attack()
+	
+	
+	if self.timer == self.timer_max	 then
+		self.displayDirection = knight.displayDirection
+		self.displayAngle = knight.move_angle
+	end
+	
+	--[[
+	if self.displayDirection == "up" then
+		self.y = knight.y - self.height + self.yRand
+		self.x = knight.x - (self.width/4) + self.xRand
+	elseif self.displayDirection == "down" then
+		self.y = knight.y + (self.height/2) + self.yRand
+		self.x = knight.x - (self.width/4) + self.xRand
+	elseif self.displayDirection == "left" then
+		self.y = knight.y - (self.height/4) + self.yRand
+		self.x = knight.x - self.width + self.xRand
+	elseif self.displayDirection == "right" then
+		self.y = knight.y - (self.height/4) + self.yRand
+		self.x = knight.x + (self.width/2) + self.xRand
+	end
+	--]]
+	
+	local radius = 70
+	self.x = knight.x + radius * math.cos(-self.displayAngle) - 16 + self.xRand
+	self.y = knight.y + radius * math.sin(-self.displayAngle) - 32 + self.yRand
+	
+	
+	self.timer = self.timer - 1
+	if self.timer <= 0 then
+		local toDelete
+		for i,effect in pairs(knight.PROJECTILES) do
+			if effect == self then
+				toDelete = i
+			end
+		end
+		table.remove(knight.PROJECTILES, toDelete)
+	end
+	
+	
+	--[[
 	if self.beingUsed then
 		self:attack()
 		self.attackAnimation = self.attackAnimation  + 1
@@ -133,7 +170,21 @@ function Sword.update(self, dt)
 			self.beingUsed = false
 			self.enemiesHit = {}
 		end
+		
+		if map:canMove(self, "up", 0) then
+			return
+		elseif map:canMove(self, "down", 0) then
+			return
+		elseif map:canMove(self, "left", 0) then
+			return
+		elseif map:canMove(self, "right", 0) then
+			return
+		else
+			self.beingUsed = false
+			knight.xSpeed = 5
+		end
 	end
+	--]]
 end
 
 function Sword.attack(self)

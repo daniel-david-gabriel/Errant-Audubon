@@ -20,6 +20,8 @@ function Fireball:_init(x, y, direction)
 	self.frameCounter = 1
 	self.frameTimer = 0
 	
+	self.max_speed = 6
+	
 	self.speed = 0
 	self.direction = direction
 	
@@ -29,6 +31,8 @@ function Fireball:_init(x, y, direction)
     
     self.quantity = 0
 	self.count = 0
+	
+	self.moveAngle = math.atan2(knight.y - self.y, knight.x - self.x)
 end
 
 function Fireball.damage(self)
@@ -76,8 +80,8 @@ function Fireball.update(self, map, dt)
 	end
 	
 	if self:collidesWith(knight) then
-		knight:knockback(self, 30)
-		--self:despawn(map)
+		knight:knockback(self, 10)
+		self:despawn(map)
 	end
 	
 	if self.count > math.pi*2 then
@@ -98,6 +102,17 @@ function Fireball.update(self, map, dt)
 	local med_speed = 2
 	local fast_speed = 3
 	
+	local a = true
+	local b = true
+	
+	a = self:move("right", self.max_speed* math.cos(self.moveAngle))
+	b = self:move("down", self.max_speed* math.sin(self.moveAngle))
+	
+	if not a or not b then
+		self:despawn(map)
+	end
+	
+	--[[
 	if self.direction == 1 then
 		if not self:move("down", med_speed) then
 			self:despawn(map)
@@ -171,7 +186,7 @@ function Fireball.update(self, map, dt)
 			self:despawn(map)
 		end
 	end
-
+	--]]
 end
 
 function Fireball.isInRange(self, enemy)

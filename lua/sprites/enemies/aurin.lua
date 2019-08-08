@@ -14,9 +14,13 @@ setmetatable(Aurin, {
 })
 
 function Aurin:_init(x, y)
-	Enemy._init(self, x, y, 32, 32, "small", 3, "claw", "eye", "tuft")
+	Enemy._init(self, x, y, 32, 32, "small", 5, "claw", "eye", "tuft")
 	
-	self.speed = 6
+	self.max_speed = 10
+	self.speed_step = 0.5
+	self.speed = 0
+	self.xSpeed = 0
+	self.ySpeed = 0
 
 	self.state = "stand"
 	self.direction  = "down"
@@ -69,6 +73,10 @@ function Aurin.draw(self)
 end
 
 function Aurin.update(self, map, dt)
+  	
+  	if self.speed > 0 then
+		self.speed = self.speed - self.speed_step
+	end
   	
   	if self:collidesWith(knight) then
 		knight:knockback(self, 10)
@@ -172,7 +180,13 @@ function Aurin.update(self, map, dt)
 	end
 	
 	if self.state == "slide" then
-		self:move(oppositeDirection(self.direction), self.slide_vel_x)
+		if self.speed <= 0 then
+			self.state = "stand"
+			return
+		end
+		self:move("left", self.speed*self.xSpeed)
+		self:move("up", self.speed*self.ySpeed)
+		--[[self:move(oppositeDirection(self.direction), self.slide_vel_x)
 		self.slide_vel_x = self.slide_vel_x - 1
 		if self.slide_vel_x == 7 then
 			table.insert(map.effects, Dust(self.x-24, self.y-8))
@@ -181,6 +195,7 @@ function Aurin.update(self, map, dt)
 			self.stateTimer = (math.random()*4) + 1
 			self.state = "stand"
 		end
+		--]]
 	else
     	self.direction = self:determineDirection(knight)
 	end
@@ -192,3 +207,34 @@ function Aurin.isInRange(self, enemy)
 
 	return (xWithinRange and yWithinRange)
 end
+
+
+function Aurin.knockback(self)
+	self.xSpeed = math.cos(math.atan2(knight.y-self.y, knight.x-self.x))
+	self.ySpeed = math.sin(math.atan2(knight.y-self.y, knight.x-self.x))
+	
+	self.speed = self.max_speed
+	
+	self.state = "slide"
+	return
+end
+
+function Aurin.damage(self)
+	Enemy.damage(self)
+	table.insert(map.effects, AttackHit(self.x-48, self.y-48))
+	hitStopTimer = 12
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
