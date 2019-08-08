@@ -42,7 +42,7 @@ function Map:_init(mapName)
 end
 
 function Map.loadTitle(self, mapName)
-	if not love.filesystem.exists("media/maps/" .. mapName .. "/title") then
+	if not love.filesystem.getInfo("media/maps/" .. mapName .. "/title") then
 		return ""
 	end
 
@@ -77,7 +77,7 @@ function Map.loadBackground(self, mapName)
 end
 
 function Map.loadForeground(self, mapName)
-	if not love.filesystem.exists("media/maps/" .. mapName .. "/foreground") then
+	if not love.filesystem.getInfo("media/maps/" .. mapName .. "/foreground") then
 		return {}
 	end
 
@@ -100,7 +100,7 @@ function Map.loadForeground(self, mapName)
 end
 
 function Map.loadEnemies(self, mapName)
-	if not love.filesystem.exists("media/maps/" .. mapName .. "/enemies") then
+	if not love.filesystem.getInfo("media/maps/" .. mapName .. "/enemies") then
 		return {}
 	end
 
@@ -164,7 +164,7 @@ function Map.createEnemy(self, enemyProperties)
 end
 
 function Map.loadDoors(self, mapName)
-	if not love.filesystem.exists("media/maps/" .. mapName .. "/doors") then
+	if not love.filesystem.getInfo("media/maps/" .. mapName .. "/doors") then
 		return {}
 	end
 
@@ -186,7 +186,7 @@ function Map.loadDoors(self, mapName)
 end
 
 function Map.loadNpcs(self, mapName)
-	if not love.filesystem.exists("media/maps/" .. mapName .. "/npcs") then
+	if not love.filesystem.getInfo("media/maps/" .. mapName .. "/npcs") then
 		return {}
 	end
 
@@ -220,7 +220,7 @@ function Map.loadNpcs(self, mapName)
 end
 
 function Map.loadShopkeepers(self, mapName)
-	if not love.filesystem.exists("media/maps/" .. mapName .. "/shopkeepers") then
+	if not love.filesystem.getInfo("media/maps/" .. mapName .. "/shopkeepers") then
 		return {}
 	end
 
@@ -254,7 +254,7 @@ function Map.loadShopkeepers(self, mapName)
 end
 
 function Map.loadTriggers(self, mapName)
-	if not love.filesystem.exists("media/maps/" .. mapName .. "/triggers") then
+	if not love.filesystem.getInfo("media/maps/" .. mapName .. "/triggers") then
 		return {}
 	end
 
@@ -275,7 +275,7 @@ function Map.loadTriggers(self, mapName)
 end
 
 function Map.loadPuzzles(self, mapName)
-	if not love.filesystem.exists("media/maps/" .. mapName .. "/puzzles") then
+	if not love.filesystem.getInfo("media/maps/" .. mapName .. "/puzzles") then
 		return {}
 	end
 
@@ -302,7 +302,7 @@ function Map.loadPuzzles(self, mapName)
 end
 
 function Map.loadLocks(self, mapName)
-	if not love.filesystem.exists("media/maps/" .. mapName .. "/locks") then
+	if not love.filesystem.getInfo("media/maps/" .. mapName .. "/locks") then
 		return {}
 	end
 
@@ -322,7 +322,7 @@ function Map.loadLocks(self, mapName)
 end
 
 function Map.loadBGM(self, mapName)
-	if not love.filesystem.exists("media/maps/" .. mapName .. "/bgm") then
+	if not love.filesystem.getInfo("media/maps/" .. mapName .. "/bgm") then
 		return ""
 	end
 	

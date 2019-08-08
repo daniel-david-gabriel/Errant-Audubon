@@ -30,7 +30,7 @@ function MainMenu:_init()
 	self.submenus[self.submenuCount] = "New Game"
 	self.submenuCount = self.submenuCount + 1
 
-	if love.filesystem.exists("save.dat") then
+	if love.filesystem.getInfo("save.dat") then
 		self.selection = 2
 		self.submenus[self.submenuCount] = "Load Game"
 		self.submenuCount = self.submenuCount + 1

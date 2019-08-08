@@ -34,7 +34,7 @@ function MapBuilder._init()
     map = {}
     local x = 1
     local y = 1
-    if love.filesystem.exists("map") then
+    if love.filesystem.getInfo("map") then
         local mapData = love.filesystem.lines("map")
         for line in mapData do
             map[y] = {}
@@ -61,7 +61,7 @@ function MapBuilder._init()
     foreground = {}
     x = 1
     y = 1
-    if love.filesystem.exists("foreground") then
+    if love.filesystem.getInfo("foreground") then
         local mapData = love.filesystem.lines("foreground")
         for line in mapData do
             foreground[y] = {}
@@ -85,7 +85,7 @@ function MapBuilder._init()
         end
     end
     
-    if love.filesystem.exists("tileset") then
+    if love.filesystem.getInfo("tileset") then
         local tsData = love.filesystem.lines("tileset")
         for line in tsData do
             tileset = line

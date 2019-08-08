@@ -89,7 +89,7 @@ function Images.loadEnemySprites(self, enemyName)
 
 	-- front
 	local frontSprites = {}
-	while love.filesystem.exists("media/sprites/enemies/" .. enemyName .. "/Front-" .. tostring(i) .. ".png") do
+	while love.filesystem.getInfo("media/sprites/enemies/" .. enemyName .. "/Front-" .. tostring(i) .. ".png") do
 		frontSprites[i] = love.graphics.newImage("media/sprites/enemies/" .. enemyName .. "/Front-" .. tostring(i) .. ".png")
 		i = i + 1
 	end
@@ -98,7 +98,7 @@ function Images.loadEnemySprites(self, enemyName)
 	-- back
 	i = 1
 	local backSprites = {}
-	while love.filesystem.exists("media/sprites/enemies/" .. enemyName .. "/Back-" .. tostring(i) .. ".png") do
+	while love.filesystem.getInfo("media/sprites/enemies/" .. enemyName .. "/Back-" .. tostring(i) .. ".png") do
 		backSprites[i] = love.graphics.newImage("media/sprites/enemies/" .. enemyName .. "/Back-" .. tostring(i) .. ".png")
 		i = i + 1
 	end

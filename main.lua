@@ -62,7 +62,6 @@ function love.keypressed(key)
 end
 
 function love.keyreleased(key)
-	--no events triggered on key release
 	activeState:keyreleased(key)
 end
 

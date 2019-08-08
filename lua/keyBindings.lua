@@ -27,7 +27,7 @@ function KeyBindings:_init()
 	self.bindings["shift"] = "lshift"
 	self.bindings["space"] = "lctrl"
 
-	if love.filesystem.exists(self.bindingsFilename) then
+	if love.filesystem.getInfo(self.bindingsFilename) then
 		self:loadBindings()
 	end
 end
